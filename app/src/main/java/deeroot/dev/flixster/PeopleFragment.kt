@@ -5,10 +5,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.codepath.asynchttpclient.AsyncHttpClient
 import com.codepath.asynchttpclient.RequestHeaders
@@ -22,18 +21,18 @@ import kotlin.collections.set
 
 private const val API_KEY = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
 
-class MoviesFragment : Fragment(), MoviesRecyclerViewAdapter.OnListFragmentInteractionListener {
+class PeopleFragment : Fragment(), PeopleRecyclerViewAdapter.OnListFragmentInteractionListener {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_movie_list, container, false)
+        val view = inflater.inflate(R.layout.fragment_person_list, container, false)
         val progressBar = view.findViewById<View>(R.id.progress) as ContentLoadingProgressBar
         val recyclerView = view.findViewById<View>(R.id.list) as RecyclerView
         val context = view.context
 
-        recyclerView.layoutManager = LinearLayoutManager(context)
+        recyclerView.layoutManager = GridLayoutManager(context, 2)
 
         updateAdapter(progressBar, recyclerView)
         return view
@@ -44,10 +43,9 @@ class MoviesFragment : Fragment(), MoviesRecyclerViewAdapter.OnListFragmentInter
 
         val client = AsyncHttpClient()
         val params = RequestParams()
-        val headers = RequestHeaders()
-        headers["X-Api-Key"] = API_KEY
+        params["api_key"] = API_KEY
 
-        client["https://api.themoviedb.org/3/movie/now_playing", headers, params, object :
+        client["https://api.themoviedb.org/3/person/popular", params, object :
             JsonHttpResponseHandler() {
             override fun onSuccess(
                 statusCode: Int,
@@ -57,15 +55,15 @@ class MoviesFragment : Fragment(), MoviesRecyclerViewAdapter.OnListFragmentInter
                 progressBar.hide()
 
                 val dataJSON = json.jsonObject.get("results") as JSONArray
-                val parksRawJSON = dataJSON.toString()
+                val peopleRawJSON = dataJSON.toString()
 
                 val gson = Gson()
-                val arrayParkType = object : TypeToken<List<Movie>>() {}.type
-                val models: List<Movie> = gson.fromJson(parksRawJSON, arrayParkType)
+                val arrayPersonType = object : TypeToken<List<Person>>() {}.type
+                val models: List<Person> = gson.fromJson(peopleRawJSON, arrayPersonType)
 
-                recyclerView.adapter = MoviesRecyclerViewAdapter(models, this@MoviesFragment)
+                recyclerView.adapter = PeopleRecyclerViewAdapter(models, this@PeopleFragment)
 
-                Log.d("MoviesFragment", "response successful")
+                Log.d("PeopleFragment", "response successful")
             }
 
             override fun onFailure(
@@ -76,13 +74,15 @@ class MoviesFragment : Fragment(), MoviesRecyclerViewAdapter.OnListFragmentInter
             ) {
                 progressBar.hide()
                 t?.message?.let {
-                    Log.e("MoviesFragment", errorResponse)
+                    Log.e("PeopleFragment", errorResponse)
                 }
             }
         }]
     }
 
-    override fun onItemClick(item: Movie) {
-        Toast.makeText(context, "Test: ${item.name}", Toast.LENGTH_SHORT).show()
+    override fun onItemClick(item: Person) {
+        val intent = android.content.Intent(context, PersonDetailActivity::class.java)
+        intent.putExtra(PersonDetailActivity.EXTRA_PERSON, Gson().toJson(item))
+        startActivity(intent)
     }
 }

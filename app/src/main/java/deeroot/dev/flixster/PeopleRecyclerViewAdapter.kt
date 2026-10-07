@@ -7,28 +7,28 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
 
-class MoviesRecyclerViewAdapter(
-    private val movies: List<Movie>,
+class PeopleRecyclerViewAdapter(
+    private val people: List<Person>,
     private val mListener: OnListFragmentInteractionListener?,
-) : RecyclerView.Adapter<MoviesRecyclerViewAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<PeopleRecyclerViewAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.fragment_movie, parent, false)
+            .inflate(R.layout.fragment_person, parent, false)
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val movie = movies[position]
-        holder.mItem = movie
-        holder.mMovieName.text = movie.name
-        holder.mMovieDescription.text = movie.description
+        val person = people[position]
+        holder.mItem = person
+        holder.mPersonName.text = person.name
 
         Glide.with(holder.mView)
-            .load(movie.imageUrl)
-            .centerCrop()
-            .into(holder.mMovieImage)
+            .load(person.profileImageUrl)
+            .transform(CenterCrop())
+            .into(holder.mPersonImage)
 
         holder.mView.setOnClickListener {
             holder.mItem?.let { item ->
@@ -37,20 +37,19 @@ class MoviesRecyclerViewAdapter(
         }
     }
 
-    override fun getItemCount(): Int = movies.size
+    override fun getItemCount(): Int = people.size
 
     class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
-        var mItem: Movie? = null
-        val mMovieImage: ImageView = mView.findViewById(R.id.movie_image)
-        val mMovieName: TextView = mView.findViewById(R.id.movie_name)
-        val mMovieDescription: TextView = mView.findViewById(R.id.movie_description)
+        var mItem: Person? = null
+        val mPersonImage: ImageView = mView.findViewById(R.id.person_image)
+        val mPersonName: TextView = mView.findViewById(R.id.person_name)
 
         override fun toString(): String {
-            return super.toString() + " '" + mMovieName.text + "'"
+            return super.toString() + " '" + mPersonName.text + "'"
         }
     }
 
     interface OnListFragmentInteractionListener {
-        fun onItemClick(item: Movie)
+        fun onItemClick(item: Person)
     }
 }

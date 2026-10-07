@@ -1,4 +1,7 @@
 <resources>
-    <string name="app_name">Flixster</string>
-    <string name="movie_image_content_description">Movie image</string>
+    <string name="app_name">FlixsterPlus</string>
+    <string name="list_header">Popular People Today</string>
+    <string name="person_image_content_description">Person headshot</string>
+    <string name="poster_image_content_description">Known-for movie poster</string>
+    <string name="known_for_prefix">Known For: %1$s</string>
 </resources>
